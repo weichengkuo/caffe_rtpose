@@ -98,3 +98,5 @@ MANIFEST-*
 *.mp4
 *.mov
 
+#Data and Output
+output/*
