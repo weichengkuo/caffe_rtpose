@@ -41,4 +41,8 @@ def closeVideo(frameFolder):
         raw_input()
     shutil.rmtree(frameFolder)
 
+if __name__ == '__main__':
+    src = './clipCollection368/0/0/I/v_LdhYI_Pq00I/003/clip.mp4'
+    folder = uzVideo(src)
+    print(folder)
 

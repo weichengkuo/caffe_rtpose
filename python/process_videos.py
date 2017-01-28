@@ -23,7 +23,7 @@ time_closeVideo = time_this(videoHandler.closeVideo)
 time_cmd = time_this(os.system)
 time_subproc = time_this(subprocess.Popen)
 
-VIDEO_DIR = './fouhey_clips'
+VIDEO_DIR = './clipCollection368/'
 rtp_command = './build/examples/rtpose/rtpose.bin --image_dir {} --write_json ./output/json/{} --write_frames {} --no_display --no_frame_drops'
 video_files = os.listdir(VIDEO_DIR)
 num_video_files = len(video_files)
