@@ -25,11 +25,12 @@ time_subproc = time_this(subprocess.Popen)
 
 VIDEO_DIR = './clipCollection368/'
 rtp_command = './build/examples/rtpose/rtpose.bin --image_dir {} --write_json ./output/json/{} --write_frames {} --no_display --no_frame_drops'
-video_files = os.listdir(VIDEO_DIR)
-num_video_files = len(video_files)
-NUM_THREAD = 3
 
-def process_single_video(fnum_id,fname):
+# video_files = os.listdir(VIDEO_DIR)
+num_video_files = len(video_files)
+NUM_THREAD = 1
+
+def process_single_video(fnum_id,fname,num_video_files):
   """
   Function to process single video
   """
@@ -48,10 +49,6 @@ def process_single_video(fnum_id,fname):
     log_str = '{} failed to finish! RTP error.'.format(video_name)
     return None,None,None,None,log_str 
 
-  # start_time = time.time()
-  # process = subprocess.Popen([full_cmd],shell=True)
-  # process.wait()
-  # rtp_time = time.time()-start_time
   frame_num = len(os.listdir(outframeFolder))
   if frame_num == 0:
     log_str = '{} failed to finish! No frame present.'.format(video_name)
@@ -87,8 +84,17 @@ def process_single_video(fnum_id,fname):
 def main():
   runtime_log_fid = open('log/process_video_log_2.txt','w')
   acc_time = {'uzTime':None,'rtp':None,'total':None,'frame_num':None,'tpf':None}
+  #Os walk the directory tree
+  video_files=[]
+  for root,dirs,files in os.walk(VIDEO_DIR):
+    for scan_fname in files:
+      if '.mp4' in scan_fname:
+        video_files.append(os.path.join(root,scan_fname))
+
+  num_video_files = len(video_files)
+
   #Parallel
-  all_time_info = Parallel(n_jobs=NUM_THREAD)(delayed(process_single_video)(fnum_id,fname) for fnum_id,fname in enumerate(video_files))
+  all_time_info = Parallel(n_jobs=NUM_THREAD)(delayed(process_single_video)(fnum_id,fname,num_video_files) for fnum_id,fname in enumerate(video_files[:1]))
 
   acc_time['write_time'] = sum([info[0] for info in all_time_info])
   acc_time['rtp'] = sum([info[1] for info in all_time_info])
