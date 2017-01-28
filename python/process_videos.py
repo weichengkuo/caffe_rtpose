@@ -27,7 +27,7 @@ VIDEO_DIR = './fouhey_clips'
 rtp_command = './build/examples/rtpose/rtpose.bin --image_dir {} --write_json ./output/json/{} --write_frames {} --no_display --no_frame_drops'
 video_files = os.listdir(VIDEO_DIR)
 num_video_files = len(video_files)
-NUM_THREAD = 6
+NUM_THREAD = 3
 
 def process_single_video(fnum_id,fname):
   """
@@ -45,7 +45,8 @@ def process_single_video(fnum_id,fname):
   print('Running RTP {}/{}:\n {}'.format(fnum_id,num_video_files,full_cmd))
   os_out, rtp_time = time_cmd(full_cmd) 
   if os_out:
-    raise RuntimeError("Failure command {}".format(full_cmd))
+    log_str = '{} failed to finish! RTP error.'.format(video_name)
+    return None,None,None,None,log_str 
 
   # start_time = time.time()
   # process = subprocess.Popen([full_cmd],shell=True)
@@ -53,7 +54,8 @@ def process_single_video(fnum_id,fname):
   # rtp_time = time.time()-start_time
   frame_num = len(os.listdir(outframeFolder))
   if frame_num == 0:
-    return None,None,None,None,None 
+    log_str = '{} failed to finish! No frame present.'.format(video_name)
+    return None,None,None,None,log_str 
 
   #Read output frames to write videos
   out_vid = 'output/videos/{}'.format(fname)
@@ -61,13 +63,15 @@ def process_single_video(fnum_id,fname):
     os.system('rm '+out_vid)
 
   if not os.path.exists(outframeFolder):
-    raise RuntimeError("Folder doesn't exist: {}".format(outframeFolder))
+    log_str = '{} failed to finish! Out frame folder missing'.format(video_name)
+    return None,None,None,None,log_str 
 
   conv_cmd = '{} -i {}/frame%06d.jpg {}'.format(videoHandler.FFMPEG_STATIC,outframeFolder,out_vid)
   print('Writing frames to video: \n {}'.format(conv_cmd))
   conv_out, write_time = time_cmd(conv_cmd)
   if conv_out:
-    raise RuntimeError("Failure command {}".format(conv_cmd))
+    log_str = '{} failed to finish! Conversion to video failed.'.format(video_name)
+    return None,None,None,None,log_str
 
   __, close_time = time_closeVideo(frameFolder)
   __, close_time2 = time_closeVideo(outframeFolder)
